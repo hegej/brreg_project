@@ -15,6 +15,7 @@ class Company(models.Model):
     registreringsdatoEnhetsregisteret = models.DateField(null=True, blank=True)
     registrertIMvaregisteret = models.BooleanField(default=False)
     frivilligMvaRegistrertBeskrivelser = models.JSONField(null=True, blank=True, default=list)
+    updated_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name} ({self.org_number})"

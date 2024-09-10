@@ -1,59 +1,21 @@
 import requests
+import datetime
 
 BASE_URL = 'https://data.brreg.no/enhetsregisteret/api/enheter'
 
-def fetch_companies(page=0, size=100, kommunenummer=None, postnummer=None, org_form=None):
+def fetch_companies(page=0, size=1000, org_form=None, is_bankrupt=None):
     params = {
         "size": size,
         "page": page,
     }
-    if kommunenummer:
-        params["kommunenummer"] = kommunenummer
-    if postnummer:
-        params["postadresse.postnummer"] = postnummer
     if org_form:
         params["organisasjonsform"] = org_form
-    
+    if is_bankrupt is not None:
+        params["konkurs"] = str(is_bankrupt).lower()
+
     response = requests.get(BASE_URL, params=params)
     response.raise_for_status()
     return response.json()
-
-def get_kommuner():
-    url = "https://data.brreg.no/enhetsregisteret/api/kommuner"
-    all_kommuner = []
-    page = 0
-    while True:
-        response = requests.get(url, params={"page": page, "size": 100})
-        response.raise_for_status()
-        data = response.json()
-        kommuner = data['_embedded']['kommuner']
-        all_kommuner.extend([kommune['nummer'] for kommune in kommuner])
-        
-        if 'next' not in data['_links']:
-            break
-        
-        page += 1
-
-    return all_kommuner
-
-def get_postnummer_for_kommune(kommunenummer):
-    params = {
-        "kommunenummer": kommunenummer,
-        "size": 10000,
-    }
-    response = requests.get(BASE_URL, params=params)
-    response.raise_for_status()
-    data = response.json()
-    postnumre = set()
-    for enhet in data.get('_embedded', {}).get('enheter', []):
-        if 'postadresse' in enhet and 'postnummer' in enhet['postadresse']:
-            postnumre.add(enhet['postadresse']['postnummer'])
-    return list(postnumre)
-
-def get_org_forms():
-    response = requests.get('https://data.brreg.no/enhetsregisteret/api/organisasjonsformer')
-    response.raise_for_status()
-    return [form['kode'] for form in response.json()['_embedded']['organisasjonsformer']]
 
 def process_company_data(data):
     companies = []
@@ -73,5 +35,6 @@ def process_company_data(data):
             'registreringsdatoEnhetsregisteret': company.get('registreringsdatoEnhetsregisteret'),
             'registrertIMvaregisteret': company.get('registrertIMvaregisteret', False),
             'frivilligMvaRegistrertBeskrivelser': company.get('frivilligMvaRegistrertBeskrivelser', []),
+            'updated_time': datetime.datetime.now(),
         })
     return companies
