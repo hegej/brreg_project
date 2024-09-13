@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Totalt antall selskaper</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    {{ total_count }}
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                                <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Antall AS</p>
+                                <h5 class="font-weight-bolder mb-0" id="as-count">
+                                    Klikk for å hente
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <button id="fetch-as-count" class="btn btn-primary">Hent antall AS</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Konkursrammede selskaper</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    {{ bankrupt_count }}
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                                <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-lg-7 mb-lg-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="d-flex flex-column h-100">
+                                <p class="mb-1 pt-2 text-bold">Konkursrammede bedrifter</p>
+                                <h5 class="font-weight-bolder">Se detaljer</h5>
+                                <p class="mb-5">Klikk under for å se en full liste over konkursrammede bedrifter</p>
+                                <a class="text-body text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="{% url 'bankrupt_companies' %}">
+                                    Se liste
+                                    <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <!--<div class="col-lg-6 ms-auto text-center mt-5 mt-lg-0">
+                            <div class="bg-gradient-primary border-radius-lg h-100">
+                                <img src="{% static 'img/shapes/waves-white.svg' %}" class="position-absolute h-100 w-50 top-0 d-lg-block d-none" alt="waves">
+                                <div class="position-relative d-flex align-items-center justify-content-center h-100">
+                                    <img class="w-100 position-relative z-index-2 pt-4" src="{% static 'img/illustrations/rocket-white.png' %}" alt="rocket">
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card h-100 p-3">
+                <div class="overflow-hidden position-relative border-radius-lg bg-cover h-100 bg-image" id="as-company-card">
+                    <span class="mask bg-gradient-dark"></span>
+                    <div class="card-body position-relative z-index-1 d-flex flex-column h-100 p-3">
+                        <h5 class="text-white font-weight-bolder mb-4 pt-2">Antall registrerte Aksjeselskap</h5>
+                        <p class="text-white">Det er registrert totalt: '407116' aksjeselskaper i Norge.</p>
+                        <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="{% url 'as_companies' %}">
+                            Se mer statistikk
+                            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fetchButton = document.getElementById('fetch-as-count');
+    const asCountElement = document.getElementById('as-count');
+
+    fetchButton.addEventListener('click', function() {
+        fetchButton.disabled = true;
+        asCountElement.textContent = 'Henter...';
+
+        fetch('/get-as-count/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.as_count) {
+                    asCountElement.textContent = data.as_count;
+                } else {
+                    asCountElement.textContent = 'Feil ved henting';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                asCountElement.textContent = 'Feil ved henting';
+            })
+            .finally(() => {
+                fetchButton.disabled = false;
+            });
+    });
+});
+</script>
+{% endblock extra_js %}

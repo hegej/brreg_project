@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Brønnøysundregistrene Dashboard{% endblock %}</title>
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between">
+                <div class="flex space-x-7">
+                    <div>
+                        <a href="{% url 'dashboard' %}" class="flex items-center py-4 px-2">
+                            <span class="font-semibold text-gray-500 text-lg">Brønnøysundregistrene</span>
+                        </a>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-1">
+                        <a href="{% url 'dashboard' %}" class="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300">Dashboard</a>
+                        <a href="{% url 'bankrupt_companies' %}" class="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300">Konkursrammede bedrifter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto mt-4 px-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-white text-center lg:text-left mt-8">
+        <div class="text-gray-700 text-center p-4">
+            © 2024 Brønnøysundregistrene Dashboard
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
